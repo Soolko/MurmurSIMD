@@ -1,0 +1,11 @@
+# VS
+/.vs/
+/out/
+CMakeSettings.json
+
+# CLion
+/.idea/workspace.xml
+/.idea/usage.statistics.xml
+/.idea/tasks.xml
+/.idea/shelf/
+/cmake-build-**/
