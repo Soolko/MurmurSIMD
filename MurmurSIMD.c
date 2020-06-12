@@ -1,3 +1,6 @@
+#include "MurmurSIMD.h"
+#include "Capabilities.h"
+
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
@@ -9,10 +12,32 @@
 
 
 /*
- * x86
+ *   Optimal path
  */
+int32_t MurmurSIMD32(const char* key, const uint32_t seed)
+{
+	struct MurmurSIMD_Capabilities capabilities = MurmurSIMD_GetCapabilities();
+	
+	#ifdef __AVX2__
+	if(capabilities.AVX2) return MurmurSIMD32_AVX2(key, seed);
+	#endif
+	
+	#ifdef __SSE2__
+	if(capabilities.SSE2) return MurmurSIMD32_SSE2(key, seed);
+	#endif
+	
+	#ifdef __MMX__
+	if(capabilities.MMX) return MurmurSIMD32_MMX(key, seed);
+	#endif
+	
+	// Fallback with no SIMD
+	return MurmurSIMD32_x86(key, seed);
+}
 
-uint32_t MurmurSIMD32_x86(const char* key, const uint32_t seed)
+/*
+ *   x86
+ */
+int32_t MurmurSIMD32_x86(const char* key, const uint32_t seed)
 {
 	const unsigned int CharsPerBlock = 4;
 	
@@ -74,33 +99,35 @@ uint32_t MurmurSIMD32_x86(const char* key, const uint32_t seed)
 /*
  *   MMX
  */
-
+#ifdef __MMX__
 __m64 static inline Multiply32_MMX(__m64 a, __m64 b)
 {
 	/*
 	 * This isn't real MMX, but it's the best I can do currently.
 	 */
 	
-	uint32_t lower = _mm_cvtsi64_si32(a) * _mm_cvtsi64_si32(b);
+	// Lower half
+	const uint32_t lower = _mm_cvtsi64_si32(a) * _mm_cvtsi64_si32(b);
 	
+	// Shift & upper half
 	a = _mm_srli_si64(a, 32);
 	b = _mm_srli_si64(b, 32);
-	uint32_t upper = _mm_cvtsi64_si32(a) * _mm_cvtsi64_si32(b);
+	const uint32_t upper = _mm_cvtsi64_si32(a) * _mm_cvtsi64_si32(b);
 	
 	return _mm_set_pi32(upper, lower);
 }
 
 __m64 static inline RotL32_MMX(const __m64 num, const int rot)
 {
-	__m64 a = _mm_slli_pi32(num, rot);
-	__m64 b = _mm_srli_pi32(num, 32 - rot);
+	const __m64 a = _mm_slli_pi32(num, rot);
+	const __m64 b = _mm_srli_pi32(num, 32 - rot);
 	return _mm_or_si64(a, b);
 }
 
 int32_t MurmurSIMD32_MMX(const char* key, const uint32_t seed)
 {
 	const unsigned int CharsPerBlock = 8;
-	int32_t length = strlen(key);
+	size_t length = strlen(key);
 	
 	const unsigned int remainder = length % CharsPerBlock;
 	if(remainder > 0) length += remainder;
@@ -110,7 +137,7 @@ int32_t MurmurSIMD32_MMX(const char* key, const uint32_t seed)
 	strcpy(data, key);
 	
 	__m64 hash = _mm_set1_pi32(seed);
-	for(int32_t i = 0; i < length; i += CharsPerBlock)
+	for(size_t i = 0; i < length; i += CharsPerBlock)
 	{
 		// Load data into XMM
 		__m64 k = _mm_setr_pi8
@@ -141,16 +168,16 @@ int32_t MurmurSIMD32_MMX(const char* key, const uint32_t seed)
 	// Convert to int
 	return _mm_cvtsi64_si32(hash) ^ _mm_cvtsi64_si32(_mm_srli_si64(hash, 32));
 }
-
+#endif
 
 /*
  *   SSE2
  */
-
+#ifdef __SSE2__
 __m128i static inline Multiply32_SSE2(const __m128i a, const __m128i b)
 {
-	__m128i tmp1 = _mm_mul_epu32(a, b);	// 0, 2
-	__m128i tmp2 = _mm_mul_epu32		// 1, 3
+	const __m128i tmp1 = _mm_mul_epu32(a, b);	// 0, 2
+	const __m128i tmp2 = _mm_mul_epu32		// 1, 3
 	(
 		_mm_srli_si128(a, 4),
 		_mm_srli_si128(b, 4)
@@ -166,15 +193,15 @@ __m128i static inline Multiply32_SSE2(const __m128i a, const __m128i b)
 
 __m128i static inline RotL32_SSE2(const __m128i num, const int rotation)
 {
-	__m128i a = _mm_slli_epi32(num, rotation);
-	__m128i b = _mm_srli_epi32(num, 32 - rotation);
+	const __m128i a = _mm_slli_epi32(num, rotation);
+	const __m128i b = _mm_srli_epi32(num, 32 - rotation);
 	return _mm_or_si128(a, b);
 }
 
 int32_t MurmurSIMD32_SSE2(const char* key, const uint32_t seed)
 {
 	const unsigned int CharsPerBlock = 16;
-	int32_t length = strlen(key);
+	size_t length = strlen(key);
 	
 	const unsigned int remainder = length % CharsPerBlock;
 	if(remainder > 0) length += remainder;
@@ -184,7 +211,7 @@ int32_t MurmurSIMD32_SSE2(const char* key, const uint32_t seed)
 	strcpy(data, key);
 	
 	__m128i hash = _mm_set1_epi32(seed);
-	for(int32_t i = 0; i < length; i += CharsPerBlock)
+	for(size_t i = 0; i < length; i += CharsPerBlock)
 	{
 		// Load data into XMM
 		__m128i k = _mm_load_si128((const __m128i*) &data[i]);
@@ -238,5 +265,109 @@ int32_t MurmurSIMD32_SSE2(const char* key, const uint32_t seed)
 	}
 	return out;
 }
+#endif
+
+/*
+ *   AVX2
+ */
+#ifdef __AVX2__
+__m256i static inline Multiply32_AVX2(const __m256i a, const __m256i b)
+{
+	const __m256i tmp1 = _mm256_mul_epu32(a, b);	// 0, 2, 4, 6
+	const __m256i tmp2 = _mm256_mul_epu32			// 1, 3, 5, 7
+	(
+		_mm256_srli_si256(a, 4),
+		_mm256_srli_si256(b, 4)
+	);
+	
+	// Combine
+	return _mm256_unpacklo_epi32
+	(
+		_mm256_shuffle_epi32(tmp1, _MM_SHUFFLE(0,0,2,0)),
+		_mm256_shuffle_epi32(tmp2, _MM_SHUFFLE(0, 0, 2, 0))
+	);
+}
+
+__m256i static inline RotL32_AVX2(const __m256i num, const int rotation)
+{
+	const __m256i a = _mm256_slli_epi32(num, rotation);
+	const __m256i b = _mm256_srli_epi32(num, 32 - rotation);
+	return _mm256_or_si256(a, b);
+}
+
+int32_t MurmurSIMD32_AVX2(const char* key, const uint32_t seed)
+{
+	const unsigned int CharsPerBlock = 32;
+	size_t length = strlen(key);
+	
+	const unsigned int remainder = length % CharsPerBlock;
+	if(remainder > 0) length += remainder;
+	
+	// Allocate formatted data
+	char* data = malloc(length);
+	strcpy(data, key);
+	
+	__m256i hash = _mm256_set1_epi32(seed);
+	for(size_t i = 0; i < length; i += CharsPerBlock)
+	{
+		__m256i k = _mm256_load_si256((const __m256i*) &data[i]);
+		
+		k = Multiply32_AVX2
+		(
+			k,
+			_mm256_set_epi32
+			(
+				(signed) 0xA329EB99,
+				(signed) 0xBE6214AE,
+				(signed) 0x4DC33A4D,
+				(signed) 0x1FCC49A2,
+				(signed) 0xC9031C00,
+				(signed) 0x4093AEE0,
+				(signed) 0xB33F1B01,
+				(signed) 0xB19CE1AA
+			)
+		);
+		k = RotL32_AVX2(k, 15);
+		k = Multiply32_AVX2
+		(
+			k,
+			_mm256_set_epi32
+			(
+				(signed) 0xC3059BF0,
+				(signed) 0x4A99D300,
+				(signed) 0x55FEC879,
+				(signed) 0x82A03CCE,
+				(signed) 0x91BB3DDD,
+				(signed) 0x1E919393,
+				(signed) 0xA39B1CE1,
+				(signed) 0xDE33BB89
+			)
+		);
+		
+		hash = _mm256_xor_si256(hash, k);
+		hash = RotL32_AVX2(hash, 13);
+		hash = Multiply32_AVX2(hash, _mm256_set1_epi32(5));
+		hash = _mm256_add_epi32(hash, _mm256_set1_epi32((signed) 0x3B11A33C));
+	}
+	free(data);
+	
+	// Finalise
+	hash = _mm256_xor_si256(hash, _mm256_set1_epi32(length));
+	hash = _mm256_xor_si256(hash, _mm256_srli_epi32(hash, 16));
+	hash = Multiply32_AVX2(hash, _mm256_set1_epi32((signed) 0xC2AD39BB));
+	hash = _mm256_xor_si256(hash, _mm256_srli_epi32(hash, 13));
+	hash = Multiply32_AVX2(hash, _mm256_set1_epi32((signed) 0xE037A692));
+	hash = _mm256_xor_si256(hash, _mm256_srli_epi32(hash, 16));
+	
+	// Convert to int
+	int32_t out = _mm256_cvtsi256_si32(hash);
+	for(unsigned int i = 0; i < 7; i++)
+	{
+		hash = _mm256_srli_si256(hash, 4);
+		out ^= _mm256_cvtsi256_si32(hash);
+	}
+	return out;
+}
+#endif
 
 #endif

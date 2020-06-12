@@ -36,9 +36,20 @@ int main()
 	// Operations test
 	printf("\nOperations Test:\n");
 	
-	const char* testString = "efzuhbxvcpp|salkjnZXCKLMCZX";
+	const char* testString = "efzuhp|salkjnZzxcvjnkkkkkkkkkkkkkkkzxc;vnzxcvzkxncvkljdsfijasodfjXCKLMCZX";
 	const uint32_t testSeed = 0xE4FCC32B;
-	//printf("\tTest String: \"%s\"\n\tTest Seed: %i\n\n", testString, testSeed);
-	printf("32bit: %i.\n", MurmurSIMD32_x86(testString, testSeed));
-	printf("SSE2 (32bit): %i\n", MurmurSIMD32_SSE2(testString, testSeed));
+	printf("\tTest String: \"%s\"\n\tTest Seed: %i\n\n", testString, testSeed);
+	printf("x86 (32bit):\t%u\n", MurmurSIMD32_x86(testString, testSeed));
+	
+	#ifdef __MMX__
+	printf("MMX (32bit):\t%u\n", MurmurSIMD32_MMX(testString, testSeed));
+	#endif
+	
+	#ifdef __SSE2__
+	printf("SSE2 (32bit):\t%u\n", MurmurSIMD32_SSE2(testString, testSeed));
+	#endif
+	
+	#ifdef __AVX2__
+	printf("AVX2 (32bit):\t%u\n", MurmurSIMD32_AVX2(testString, testSeed));
+	#endif
 }
