@@ -12,7 +12,7 @@ endif()
 
 # Executable
 add_library(MurmurSIMD
-	MurmurSIMD.c	MurmurSIMD.h
+	MurmurSIMD.h MurmurSIMD.c MurmurSIMD32.c MurmurSIMD64.c
 	Capabilities.c	Capabilities.h
 )
 
