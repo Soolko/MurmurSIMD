@@ -21,14 +21,14 @@ int32_t MurmurSIMD32_x86(const char* key, const int32_t seed)
 	if(remainder > 0) length += remainder;
 	
 	// Allocate formatted data
-	char* data = malloc(length);
+	char* data = malloc(length + 1);
 	strcpy(data, key);
 	
 	int32_t hash = seed;
 	for(size_t i = 0; i < length; i += CharsPerBlock)
 	{
 		// Pack chars into int
-		int32_t k = *((const int32_t*) &key[i]);
+		int32_t k = *((const int32_t*) &data[i]);
 		
 		k *= 0xC3AE621C;
 		k = RotL32_x86(k, 15);

@@ -21,7 +21,7 @@ int64_t MurmurSIMD64_x86(const char* key, int64_t seed)
 	if(remainder > 0) length += remainder;
 	
 	// Allocate formatted data
-	char* data = malloc(length);
+	char* data = malloc(length + 1);
 	strcpy(data, key);
 	
 	int64_t hash = seed;

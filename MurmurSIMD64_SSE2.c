@@ -68,7 +68,7 @@ int64_t MurmurSIMD64_SSE2(const char* key, const int64_t seed)
 	if(remainder > 0) length += remainder;
 	
 	// Allocate formatted data
-	char* data = malloc(length);
+	char* data = malloc(length + 1);
 	strcpy(data, key);
 	
 	__m128i hash = _mm_set1_epi64x(seed);

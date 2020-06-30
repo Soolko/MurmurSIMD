@@ -62,7 +62,7 @@ int32_t MurmurSIMD32_MMX(const char* key, const int32_t seed)
 	if(remainder > 0) length += remainder;
 	
 	// Allocate formatted data
-	char* data = malloc(length);
+	char* data = malloc(length + 1);
 	strcpy(data, key);
 	
 	__m64 hash = _mm_set1_pi32(seed);

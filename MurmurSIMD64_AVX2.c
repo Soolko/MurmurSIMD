@@ -62,7 +62,7 @@ int64_t MurmurSIMD64_AVX2(const char* key, const int64_t seed)
 	if(remainder > 0) length += remainder;
 	
 	// Allocate formatted data
-	char* data = malloc(length);
+	char* data = malloc(length + 1);
 	strcpy(data, key);
 	
 	__m256i hash = _mm256_set1_epi64x(seed);
