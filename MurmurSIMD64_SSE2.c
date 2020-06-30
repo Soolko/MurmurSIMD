@@ -10,9 +10,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <immintrin.h>
+#include "Targets.h"
+#include <emmintrin.h>	// SSE2
 
-__m128i static inline Multiply64_SSE2(const __m128i ab, const __m128i cd)
+__m128i SSE2_METHOD static inline Multiply64_SSE2(const __m128i ab, const __m128i cd)
 {
 	/*
 	 * Based on:
@@ -52,14 +53,14 @@ __m128i static inline Multiply64_SSE2(const __m128i ab, const __m128i cd)
 	return _mm_add_epi64(high, ac);
 }
 
-__m128i static inline RotL64_SSE2(const __m128i num, const int rotation)
+__m128i SSE2_METHOD static inline RotL64_SSE2(const __m128i num, const int rotation)
 {
 	const __m128i a = _mm_slli_epi64(num, rotation);
 	const __m128i b = _mm_srli_epi64(num, 64 - rotation);
 	return _mm_or_si128(a, b);
 }
 
-int64_t MurmurSIMD64_SSE2(const char* key, const int64_t seed)
+int64_t SSE2_METHOD MurmurSIMD64_SSE2(const char* key, const int64_t seed)
 {
 	const unsigned int CharsPerBlock = sizeof(__m128i);
 	uint64_t length = strlen(key);

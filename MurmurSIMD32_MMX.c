@@ -10,9 +10,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <immintrin.h>
+#include "Targets.h"
+#include <mmintrin.h>	// MMX
 
-__m64 static inline Multiply32_MMX(const __m64 ab, const __m64 cd)
+__m64 MMX_METHOD static inline Multiply32_MMX(const __m64 ab, const __m64 cd)
 {
 	/*
 	 * Lower half is achieved by: __m64 * (0xFFFF - 16 bit all 1s)
@@ -46,14 +47,14 @@ __m64 static inline Multiply32_MMX(const __m64 ab, const __m64 cd)
 	return _mm_add_pi32(high, ac);
 }
 
-__m64 static inline RotL32_MMX(const __m64 num, const int rot)
+__m64 MMX_METHOD static inline RotL32_MMX(const __m64 num, const int rot)
 {
 	const __m64 a = _mm_slli_pi32(num, rot);
 	const __m64 b = _mm_srli_pi32(num, 32 - rot);
 	return _mm_or_si64(a, b);
 }
 
-int32_t MurmurSIMD32_MMX(const char* key, const int32_t seed)
+int32_t MMX_METHOD MurmurSIMD32_MMX(const char* key, const int32_t seed)
 {
 	const unsigned int CharsPerBlock = sizeof(__m64);
 	uint32_t length = strlen(key);

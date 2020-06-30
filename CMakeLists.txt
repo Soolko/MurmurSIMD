@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.17)
 project(MurmurSIMD C)
 
 set(CMAKE_C_STANDARD 99)
@@ -9,6 +9,8 @@ option(MurmurSIMD_Test "Test MurmurSIMD" OFF)
 if(${MurmurSIMD_DisableSIMD})
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DMURMURSIMD_DISABLE_SIMD")
 endif()
+
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mavx2")
 
 # Executable
 add_library(MurmurSIMD

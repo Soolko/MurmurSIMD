@@ -7,9 +7,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <immintrin.h>
+#include "Targets.h"
+#include <x86intrin.h>	// AVX2
 
-__m256i static inline Multiply32_AVX2(const __m256i a, const __m256i b)
+__m256i AVX2_METHOD static inline Multiply32_AVX2(const __m256i a, const __m256i b)
 {
 	const __m256i tmp1 = _mm256_mul_epu32(a, b);	// 0, 2, 4, 6
 	const __m256i tmp2 = _mm256_mul_epu32			// 1, 3, 5, 7
@@ -26,16 +27,16 @@ __m256i static inline Multiply32_AVX2(const __m256i a, const __m256i b)
 	);
 }
 
-__m256i static inline RotL32_AVX2(const __m256i num, const int rotation)
+__m256i AVX2_METHOD static inline RotL32_AVX2(const __m256i num, const int rotation)
 {
 	const __m256i a = _mm256_slli_epi32(num, rotation);
 	const __m256i b = _mm256_srli_epi32(num, 32 - rotation);
 	return _mm256_or_si256(a, b);
 }
 
-int32_t MurmurSIMD32_AVX2(const char* key, const uint32_t seed)
+int32_t AVX2_METHOD MurmurSIMD32_AVX2(const char* key, const uint32_t seed)
 {
-	const unsigned int CharsPerBlock = sizeof(__mm256i);
+	const unsigned int CharsPerBlock = sizeof(__m256i);
 	uint32_t length = strlen(key);
 	
 	const unsigned int remainder = length % CharsPerBlock;

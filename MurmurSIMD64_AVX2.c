@@ -6,7 +6,14 @@
 #ifndef MURMURSIMD_DISABLE_SIMD
 #ifdef __AVX2__
 
-__m256i static inline Multiply64_AVX2(const __m256i ab, const __m256i cd)
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include "Targets.h"
+#include <immintrin.h>	// AVX2
+
+__m256i AVX2_METHOD static inline Multiply64_AVX2(const __m256i ab, const __m256i cd)
 {
 	/*
 	 * Based on:
@@ -46,14 +53,14 @@ __m256i static inline Multiply64_AVX2(const __m256i ab, const __m256i cd)
 	return _mm256_add_epi64(high, ac);
 }
 
-__m256i static inline RotL64_AVX2(const __m256i num, const int rotation)
+__m256i AVX2_METHOD static inline RotL64_AVX2(const __m256i num, const int rotation)
 {
 	const __m256i a = _mm256_slli_epi64(num, rotation);
 	const __m256i b = _mm256_srli_epi64(num, 64 - rotation);
 	return _mm256_or_si256(a, b);
 }
 
-int64_t MurmurSIMD64_AVX2(const char* key, const int64_t seed)
+int64_t AVX2_METHOD MurmurSIMD64_AVX2(const char* key, const int64_t seed)
 {
 	const unsigned int CharsPerBlock = sizeof(__m256i);
 	uint64_t length = strlen(key);
