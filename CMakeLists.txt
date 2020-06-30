@@ -12,7 +12,17 @@ endif()
 
 # Executable
 add_library(MurmurSIMD
-	MurmurSIMD.h MurmurSIMD.c MurmurSIMD32.c MurmurSIMD64.c
+	# Core Sources
+	MurmurSIMD.h
+	MurmurSIMD.c
+	
+	# 64bit
+	MurmurSIMD64_x86.c MurmurSIMD64_SSE2.c MurmurSIMD64_AVX2.c
+	
+	# 32bit
+	MurmurSIMD32_x86.c MurmurSIMD32_MMX.c MurmurSIMD32_SSE2.c MurmurSIMD32_AVX2.c
+	
+	# Extra
 	Capabilities.c	Capabilities.h
 )
 

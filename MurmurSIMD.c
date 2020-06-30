@@ -2,6 +2,7 @@
  * This hash algorithm is based on this:
  * https://github.com/aappleby/smhasher/blob/master/src/MurmurHash3.cpp
  */
+
 #include "MurmurSIMD.h"
 #include "Capabilities.h"
 
