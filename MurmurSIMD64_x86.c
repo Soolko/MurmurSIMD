@@ -12,7 +12,7 @@ int64_t static inline RotL64_x64(const int64_t num, const int rot)
 	return (num << rot) | (num >> (64 - rot));
 }
 
-int64_t MurmurSIMD64_x64(const char* key, int64_t seed)
+int64_t MurmurSIMD64_x86(const char* key, int64_t seed)
 {
 	const unsigned int CharsPerBlock = sizeof(int64_t);
 	size_t length = strlen(key);

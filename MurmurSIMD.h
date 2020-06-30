@@ -39,7 +39,7 @@ int32_t MurmurSIMD32_AVX2(const char* key, uint32_t seed);
 /*
  *   64bit
  */
-int64_t MurmurSIMD64_x64(const char* key, int64_t seed);
+int64_t MurmurSIMD64_x86(const char* key, int64_t seed);
 
 #ifndef MURMURSIMD_DISABLE_SIMD
 

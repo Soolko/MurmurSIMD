@@ -58,7 +58,7 @@ int main()
 	// 64 bit
 	const int64_t testSeed64 = 0xCA3BDA11E4FCC32B;
 	printf("\n64bit:\n\tTest String: \"%s\"\n\tTest Seed: %zi\n\n", testString, testSeed64);
-	printf("x86_64:\t%zu\n", MurmurSIMD64_x64(testString, testSeed64));
+	printf("x86_64:\t%zu\n", MurmurSIMD64_x86(testString, testSeed64));
 	
 	#ifdef __SSE2__
 	printf("SSE2:\t%zu\n", MurmurSIMD64_SSE2(testString, testSeed64));

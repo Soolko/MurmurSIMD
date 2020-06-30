@@ -34,5 +34,5 @@ int64_t MurmurSIMD64(const char* key, const int64_t seed)
 	#ifdef __SSE2__
 	if(capabilities.SSE2)	return MurmurSIMD64_SSE2(key, seed);
 	#endif
-	return MurmurSIMD64_x64(key, seed);
+	return MurmurSIMD64_x86(key, seed);
 }
