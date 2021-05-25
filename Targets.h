@@ -1,24 +1,18 @@
 #ifndef MURMURSIMD_TARGETS_H
 #define MURMURSIMD_TARGETS_H
 
-#ifndef MURMURSIMD_DISABLE_TARGETS
+// Inlining
+#define MURMURSIMD_FORCED_INLINE inline __attribute__((always_inline))
 
-#ifndef __x86_64__	// 32bit
+// SIMD
+#define MURMURSIMD_METHOD_SCALAR __attribute__((target("default")))
+#define MURMURSIMD_METHOD_MMX    __attribute__((target("mmx")))
+#define MURMURSIMD_METHOD_SSE2   __attribute__((target("sse2")))
+#define MURMURSIMD_METHOD_AVX2   __attribute__((target("avx2")))
 
-#define x86_METHOD	__attribute__((target("arch=pentium")))
-#define MMX_METHOD	__attribute__((target("arch=pentium-mmx")))
-#define SSE2_METHOD	__attribute__((target("arch=pentium4")))
-#define AVX2_METHOD	__attribute__((target("avx2")))
+// Set big endian if other libraries are active
+#ifdef SDL_BIG_ENDIAN
+#define MURMURSIMD_FLIP_ENDIAN
+#endif
 
-#else	// 64bit
-
-#define x86_METHOD	// Let the compiler decide
-#define MMX_METHOD	// Let the compiler decide
-#define SSE2_METHOD	__attribute__((target("sse2")))
-#define AVX2_METHOD	__attribute__((target("avx2")))
-
-#endif	// x86_64
-
-#endif	// MURMURSIMD_DISABLE_TARGETS
-
-#endif	// Header
+#endif
