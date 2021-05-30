@@ -5,6 +5,6 @@ set(CMAKE_C_STANDARD 99)
 
 # Executable
 add_library(MurmurSIMD
-	MurmurSIMD.h
+	MurmurSIMD.h MurmurSIMD.c
 	MurmurSIMD32_Scalar.c
 )
