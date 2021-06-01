@@ -11,4 +11,7 @@ add_library(MurmurSIMD
 	MurmurSIMD/MurmurSIMD32_Scalar.c
 )
 
-target_include_directories(MurmurSIMD PUBLIC MurmurSIMD/Include PRIVATE MurmurSIMD)
+target_include_directories(MurmurSIMD
+	PUBLIC MurmurSIMD/Include
+	PRIVATE MurmurSIMD
+)
