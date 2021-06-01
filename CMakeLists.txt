@@ -12,6 +12,6 @@ add_library(MurmurSIMD
 )
 
 target_include_directories(MurmurSIMD
-	PUBLIC MurmurSIMD/Include
+	PUBLIC  MurmurSIMD/Include
 	PRIVATE MurmurSIMD
 )
