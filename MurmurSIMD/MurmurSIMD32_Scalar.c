@@ -1,5 +1,5 @@
-#include "Include/MurmurSIMD.h"
-#include "Include/MurmurSIMD_Internal.h"
+#include "MurmurSIMD.h"
+#include "MurmurSIMD_Internal.h"
 
 MURMURSIMD_FORCED_INLINE
 uint32_t RotL32(uint32_t x, int8_t r)
